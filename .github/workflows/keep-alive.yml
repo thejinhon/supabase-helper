@@ -1,0 +1,29 @@
+
+name: Supabase保活机器人
+
+on:
+  schedule:
+    - cron: '0 1,13 * * *' # 每天运行两次
+  workflow_dispatch: # 允许手动点按钮测试
+
+jobs:
+  wake-up:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 安装运行工具
+        # 这里会自动安装需要的库，不需要 package.json
+        run: npm install @supabase/supabase-js tsx
+
+      - name: 执行保活脚本
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: npx tsx scripts/keep-alive.ts
